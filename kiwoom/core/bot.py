@@ -263,7 +263,7 @@ class Bot:
             one of market gubuns in string
         :param period: str
             one of tick, min, day, week, month and year
-        :param unit: int
+        :param unit: int 분봉의 형태. 1분봉, 3분봉 등..
             1, 3, 5, 10, 30 etc.. (cf. 1 bar = unit * period)
         :param start: str
             string of start day in format 'YYYYMMDD'

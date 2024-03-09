@@ -44,6 +44,7 @@ class Downloader:
         # Define a wrapper
         def wrapper(*args, **kwargs):
             # Extract bot instance
+            """ histories 함수의 0번째 인자는 self 니까. bot instance가 추출됨."""
             bot = args[0]
             Downloader.nrq = 0
 

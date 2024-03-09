@@ -20,6 +20,28 @@ from kiwoom.utils.manager import Downloader
 class Server:
     def __init__(self):
         from kiwoom.core.bot import Bot
+
+        """
+        Server 인스턴스가 생성될 때 이들 객체가 아직 할당되지 않았음을 명시
+        이는 인스턴스가 생성된 직후 바로 사용될 준비가 되어 있지 않음을 의미하며
+        추가적인 설정이 필요함을 나타냅니다.
+
+        이러 설계를 하는 이유
+        1) 지연 초기화(Lazy Initialization): 
+        Server 인스턴스가 생성될 때는 모든 필요한 객체가 준비되지 않았을 수 있습니다. 
+        init 메소드를 통해 나중에 필요한 객체들을 전달할 수 있으므로, 
+        인스턴스 생성과 초기화를 분리할 수 있습니다.
+        재구성(Reconfiguration): 이미 생성된 Server 인스턴스의 구성을 변경해야 할 경우, 
+        init 메소드를 다시 호출하여 새로운 Bot, Kiwoom, Share 객체를 설정할 수 있습니다. 
+        이는 인스턴스의 재사용성을 높여줍니다.
+        인스턴스의 재사용!!
+
+        결론적으로, __init__과 init 메소드의 분리는 클래스의 인스턴스 생성과 초기화 과정을 
+        더 유연하게 관리할 수 있게 해주며, 특히 복잡한 의존성이 있는 객체들 사이의 상호작용을 
+        설정하는 경우에 유용합니다.    
+
+        """
+
         self.bot: Bot = None
         self.api: Kiwoom = None
         self.share: Share = None

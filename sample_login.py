@@ -1,8 +1,8 @@
-
 import sys
-from kiwoom import Bot
-from PyQt5.QtWidgets import QApplication
+# from kiwoom import Bot
+from kiwoom.core import Bot
 
+from PyQt5.QtWidgets import QApplication
 
 class MyTradingSystem(Bot):
     def __init__(self, server=None):
@@ -31,3 +31,5 @@ if __name__ == '__main__':
     win.setWindowTitle('Quit!')
     win.show()
     sys.exit(app.exec())
+
+
