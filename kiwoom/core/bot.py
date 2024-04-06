@@ -420,3 +420,120 @@ class Bot:
         app = QApplication.instance()
         app.closeAllWindows()
         app.exit(ecode)
+
+    def histories_store_database(
+            self,
+            market=None,
+            sector=None,
+            period=None,
+            unit=None,
+            start=None,
+            end=None,
+            slice=None,
+            code=None,
+            path=None,
+            merge=None,
+            warnings=None,
+    ):
+        """
+        Download historical data of partial or all items in given market/sector and store it in DB.
+        histories 함수를 기반으로 Pandas를 이용해서 저장하는 함수 생성
+        """
+
+        # Initialize status
+        # naem() 현재 실행중인 메소드의 이름을 문자열로 반환.
+        # def remove_single(self, fn, key=None): key가 없으면, fn 이름 기준으로 데이터를 삭제한다.
+        """
+        def remove_single(self, fn, key=None):
+            if key is None:
+                if fn in self.single:
+                    del self.single[fn]
+                return
+            if fn in self.single:
+                if key in self.single[fn]:
+                    del self.single[fn][key]
+        """
+        self.share.remove_single(name())
+        self.share.single[name()]['nrq'] = 0  # number of request
+        self.share.single[name()]['cnt'] = 0  # number of stocks
+        self.share.update_args(name(), effective_args(locals()))
+
+        """
+            Validate given arguments
+        """
+        # To decide what to download
+        lst, ctype, mname = None, None, None
+        if not any([market, sector]) or all([market, sector]):
+            raise RuntimeError("Download target must be either of 'market' or 'sector' .")
+        elif market is not None:
+            lst, ctype, mname = self.stock_list(market), str(history.STOCK).lower(), history.MARKET[market]
+        elif sector is not None:
+            lst, ctype, mname = self.sector_list(sector), str(history.SECTOR).lower(), history.MARKET_GUBUNS[sector]
+
+        from_, to_ = 0, None
+        if all([slice, code]):
+            raise RuntimeError("Only one option is available: either of 'slice' or 'start_code'.")
+        # Optional - Slice
+        elif slice is not None:
+            try:
+                from_, to_ = slice
+            except ValueError:
+                raise ValueError(f'Slice must be (from, to), (from, None), or (None, to) not {slice}.')
+        # Option2 - Code
+        elif code is not None:
+            from_, to_ = lst.index(code), None
+
+        # Select target in download list
+        tot = len(lst)
+        lst = lst[from_: to_]
+        
+        # To Print progress bar
+        divisor = history.DOWNLOAD_PROGRESS_DISPLAY
+        if len(lst) < 4 * divisor:
+            # At least print 25% of progress if possible
+            divisor = max(1, len(lst) // 4)
+
+        """
+            Start downloading
+        """
+        # To Download
+        status = ''
+        begin = time()
+        print(f'Download Start for {len(lst)} {ctype}s in {mname}.')
+        print(f' - Encoding : {config.ENCODING}\n - DataPath : {path}')
+
+        for i, code in enumerate(lst):
+            if i % divisor == 0:
+                pct = ((from_ + i) / tot) * 100
+                print(f'Downloading..\t{pct: .1f}% *{from_ + i} of {tot}')
+
+            # Try downloading
+            try:
+                self.history(code, period, unit=unit, start=start, end=end, path=path, merge=merge, warning=warning)
+            # 1) Error with starting Bot.history() (at the first call)
+            except Exception:
+                args = unpack_args(self.share.get_args('history'))
+                print(f"\nAn error at Bot.history({args}).\n\n{format_exc()}")
+                return ExitType.FAILURE
+
+            # 2) Error with continuing Signal.history() or Slot.history()
+            if self.share.get_single('history', 'error'):
+                # Note that error message will be printed
+                return ExitType.FAILURE
+
+            # 3) Error with reaching the request limit or error with frozen server
+            elif self.share.get_single('history', 'restart'):
+                # If it's impossible to download with the trick
+                if self.share.get_single('history', 'impossible'):
+                    print(f"\n[{clock()}] The {ctype} {code} can't be downloaded with speeding.")
+                    return ExitType.IMPOSSIBLE
+                break
+
+
+
+
+
+
+
+
+

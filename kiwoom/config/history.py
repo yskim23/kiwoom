@@ -277,7 +277,7 @@ _PERIOD_TO_TR_CODE = {
         STOCK: 'opt10094',
         SECTOR: 'opt20019'
     }
-}
+}   
 
 # Map TR code to matching period
 _TR_CODE_TO_PERIOD = {
