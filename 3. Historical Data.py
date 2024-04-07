@@ -6,7 +6,7 @@
 
 config.MARKETS = {
     '0': 'KOSPI',
-    '3': 'ELW',SSSA
+    '3': 'ELW',
     '4': '뮤추얼펀드',
     '5': '신주인수권',
     '6': '리츠',
@@ -68,46 +68,45 @@ class MyBot(Bot):
         3) 다운로드 결과 확인
         """
         # 경고 메세지 제거
-        config.MUTE = True
+        config.MUTE = True        
 
         # 로그인 요청
         self.login()
+# begin of 주석#1 : 2024.04.07
+        # # 시장 데이터 요청
+        # kwargs = {
+        #     # 1) 시장선택 - print(config.MARKETS), {'0': 'KOSPI', '10': 'KOSDAQ', ...}
+        #     'market': '0',
+        #     # 2) 기간선택 - print(config.PERIODS), ['tick', 'min', 'day', 'week', 'month', 'year']
+        #     'period': 'tick',
+        #     # 3) 저장위치 - 다운받은 데이터 csv 파일로 저장할 위치
+        #     'path': 'C:/Data/market/KOSPI/tick',
+        #     # 4) 병합 - 다운받은 데이터와 기존에 존재하는 csv 파일의 병합여부
+        #     'merge': True,
+        #     # 5) 경고 - 경고 메세지 출력 여부
+        #     'warning': False
+        # } if kwargs is None else kwargs
 
-        # 시장 데이터 요청
+        # # 다운로드 시작
+        # result = self.histories(**kwargs)
+# End of 주석#1 : 2024.04.07        
+
+#Begin of 개별 종목 테스트 : 2024.04.07
+
         kwargs = {
-            # 1) 시장선택 - print(config.MARKETS), {'0': 'KOSPI', '10': 'KOSDAQ', ...}
-            'market': '0',
-            # 2) 기간선택 - print(config.PERIODS), ['tick', 'min', 'day', 'week', 'month', 'year']
-            'period': 'tick',
-            # 3) 저장위치 - 다운받은 데이터 csv 파일로 저장할 위치
+            'code' : '005930',            
+            'period' : 'min',
+            'unit' : 3,
             'path': 'C:/Data/market/KOSPI/tick',
-            # 4) 병합 - 다운받은 데이터와 기존에 존재하는 csv 파일의 병합여부
-            'merge': True,
-            # 5) 경고 - 경고 메세지 출력 여부
-            'warning': False
-        } if kwargs is None else kwargs
+            'merge' : True,
+            'warning' : False,
+            'prev_next' : '0'
+        }
 
-        # 다운로드 시작
-        """ 함수 호출에서 ** 사용 시 
-            딕셔너리 변수의 key, value 값을 인자에 매핑해서 전달.
-            아래 histories 함수의 인자명과 key 명이 값은 곳에 value 값을 할당해서 전달.
-        def histories(
-            self,
-            market=None,
-            sector=None,
-            period=None,
-            unit=None,
-            start=None,
-            end=None,
-            slice=None,
-            code=None,
-            path=None,
-            merge=False,
-            warning=True 
-        ):        
+        result = self.history(**kwargs)
+#End of 개별 종목 테스트 : 2024.04.07
 
-        """
-        result = self.histories(**kwargs)
+
 
         # 결과 확인
         # 1) 0 = ExitCode.SUCCESS : 완전히 다 받은 경우
@@ -140,31 +139,31 @@ Multi-processing을 활용하여 24시간 다운로드 받을 수 있는 버전
 
 
 # 24시간 끊기지 않는 버전
-def run_24(kwargs, share):
-    # To make process stable
-    time.sleep(5)
+# def run_24(kwargs, share):
+#     # To make process stable
+#     time.sleep(5)
 
-    # To suppress warning messages
-    config.MUTE = True
+#     # To suppress warning messages
+#     config.MUTE = True
 
-    # 초기화 및 로그인
-    app = QApplication(sys.argv)
-    bot = MyBot()
-    bot.login()
+#     # 초기화 및 로그인
+#     app = QApplication(sys.argv)
+#     bot = MyBot()
+#     bot.login()
 
-    """
-    Hidden
-    """
+#     """
+#     Hidden
+#     """
 
-    # 다운로드 시작
-    result = bot.histories(**kwargs)
+#     # 다운로드 시작
+#     result = bot.histories(**kwargs)
 
-    # 결과 저장 및 공유
-    share['result'] = result
-    share['complete'] = True
+#     # 결과 저장 및 공유
+#     share['result'] = result
+#     share['complete'] = True
 
-    # Bot 실행 종료
-    app.exit()
+#     # Bot 실행 종료
+#     app.exit()
 
 
 # 24시간 끊기지 않는 버전 실행 스크립트
